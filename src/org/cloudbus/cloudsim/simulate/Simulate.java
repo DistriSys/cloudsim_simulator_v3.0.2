@@ -34,15 +34,15 @@ import org.json.simple.parser.JSONParser;
  */
 public class Simulate {
 	
-//	private static final String testcaseFilePath = "C:\\Users\\Kahn\\workspace\\Scheduler_Emulation\\testcases\\testcase_5.json";
-	private static final String testcaseFilePath = "/home/ngtrieuvi92/thesis/cloudsim_simulator_v2.0/testcases/testcase_5.json";
+	private static final String testcaseFilePath = "D:\\PD Nguyen\\workspace\\CloudSim-vidai-2016-v2\\testcases\\testcase_ISPDC_paper_50step.json";
+//	private static final String testcaseFilePath = "/home/ngtrieuvi92/zz/eclipse/cloudsim_simulator_v2.0/testcases/testcase_1.json";
 	
 	/**
 	 * if USER_ALPHA_RATIO = true; simulate will apply alpha ratio to calc, 
 	 * if USER_ALPHA_RATIO = false alpha ratio will be set 1:1
 	 */
 	
-	public static final boolean USER_ALPHA_RATIO = true;
+	public static final boolean USER_ALPHA_RATIO = false;
 	public static final boolean SCALABLE = false;
 	public static final boolean UPDATE_SCALE_PARTNER = false;
 	
@@ -107,8 +107,8 @@ public class Simulate {
 	        		long fileSize = (Long) m_cloudlet.get("fileSize");
 	        		long outputSize = (Long) m_cloudlet.get("outputSize");
 	        		int pesNumber = ((Long) m_cloudlet.get("pesNumber")).intValue();
-	        		double deadline = (Double) m_cloudlet.get("deadline");
-	        		double userRequestTime = (Double) m_cloudlet.get("userRequestTime");
+	        		double deadline = ((Long) m_cloudlet.get("deadline")).doubleValue();
+	        		double userRequestTime = ((Long) m_cloudlet.get("userRequestTime")).doubleValue();
 	            	
 	            	for (int k = 0; k < cloudlet_quantity; k++) {          		
 	            		UtilizationModel utilizationModel = new UtilizationModelFull();
@@ -169,11 +169,11 @@ public class Simulate {
 		String arch = (String) d_info.get("arch");
 		String os = (String) d_info.get("os");
 		String vmm = (String) d_info.get("vmm");
-		double time_zone = (double) d_info.get("time_zone");
-		double cost = (double) d_info.get("cost");
+		double time_zone = ((Long) d_info.get("time_zone")).doubleValue();
+		double cost = ((Long) d_info.get("cost")).doubleValue();
 		double costPerMem = (double) d_info.get("costPerMem");
 		double costPerStorage = (double) d_info.get("costPerStorage");
-		double costPerBw = (double) d_info.get("costPerBw");
+		double costPerBw = ((Long) d_info.get("costPerBw")).doubleValue();
 		JSONObject hosts = (JSONObject) d_info.get("hosts");
 		int hosts_quantity = ((Long) hosts.get("quantity")).intValue();
 		
