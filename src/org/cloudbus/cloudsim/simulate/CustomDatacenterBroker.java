@@ -27,7 +27,7 @@ public class CustomDatacenterBroker extends DatacenterBroker {
 		
 	private int estimationStatus = STOPPED;
 	private List<PartnerInfomation> partnersList = new ArrayList<PartnerInfomation>();
-	private double vmSize;
+	private double vmSize = 0;
 	protected Map<Integer,EstimationCloudletOfPartner> estimateCloudletofParnerMap;
 	
 	public CustomDatacenterBroker(String name) throws Exception {
@@ -548,6 +548,10 @@ public class CustomDatacenterBroker extends DatacenterBroker {
 
 	public void setVmSize(double vmSize) {
 		this.vmSize = vmSize;
+	}
+
+	public void appendVmSize(double vmSize) {
+		this.vmSize += vmSize;
 	}
 
 	public List<ScaleObject> getScaleList() {

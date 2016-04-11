@@ -34,7 +34,7 @@ import org.json.simple.parser.JSONParser;
  */
 public class Simulate {
 	
-	private static final String testcaseFilePath = "D:\\PD Nguyen\\workspace\\CloudSim-ISPDC\\testcases\\testcase_upscale\\testcase_ISPDC_upcale_2x_200.json";
+	private static final String testcaseFilePath = "D:\\PD Nguyen\\workspace\\2016ISPDC\\testcases\\testcase_ISPDC_paper_100step.json";
 //	private static final String testcaseFilePath = "/home/ngtrieuvi92/zz/eclipse/cloudsim_simulator_v2.0/testcases/testcase_1.json";
 	
 	/**
@@ -44,7 +44,7 @@ public class Simulate {
 	
 	public static final boolean USER_ALPHA_RATIO = true;
 	public static final boolean SCALABLE = true;
-	public static final boolean UPDATE_SCALE_PARTNER = false;
+	public static final boolean UPDATE_SCALE_PARTNER = true;
 	
 	public static int cloudletLength = 100;
 	
@@ -126,9 +126,6 @@ public class Simulate {
             			JSONObject m_scale = (JSONObject) scaleArr.get(j);
             			int mips = ((Long) m_scale.get("mips")).intValue();
             			double scaleTime = ((Long) m_scale.get("scaleTime")).doubleValue();
-            			
-            			ScaleObject so = new ScaleObject(mips, scaleTime);
-            			broker.getScaleList().add(so);
             		}
             	}
 
@@ -243,7 +240,7 @@ public class Simulate {
 			
 			vmList.add(vm);
 			
-			broker.setVmSize(mips);
+			broker.appendVmSize(mips);
 
 			Log.printLine(brokerName + ": creating Vm #" + vmId);
 		}
