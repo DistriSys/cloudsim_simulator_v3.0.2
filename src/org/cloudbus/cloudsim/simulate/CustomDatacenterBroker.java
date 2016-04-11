@@ -111,7 +111,7 @@ public class CustomDatacenterBroker extends DatacenterBroker {
 		Log.printLine(this.getName() + " submit Cloudlet");
 		for (Cloudlet cloudlet: getCloudletList()) {
 			addCloudletToEstimationList(cloudlet);
-			Log.printLine("Cloudlet #" + cloudlet.getCloudletId() + " has been submitted!");
+//			Log.printLine("Cloudlet #" + cloudlet.getCloudletId() + " has been submitted!");
 		}
 	}
 	private void addCloudletToEstimationList(Cloudlet cloudlet) {
@@ -179,7 +179,8 @@ public class CustomDatacenterBroker extends DatacenterBroker {
 							double newRatio = partnerVm / (ourVm + so.getMips());
 							pi.setRatio(newRatio);
 							
-							sendNow(pi.getPartnerId(), CloudSimTags.PARTNER_SCALE);
+							sendNow(pi.getPartnerId(), CloudSimTags.PARTNER_SCALE, so);
+							Log.printLine(getName() + ": processScale ID:" + pi.getPartnerId() +" newRatio: " + partnerVm +"/" + (ourVm + so.getMips()));
 						} else {
 							// 1:1 ratio
 							pi.setPartnerVm(pi.getPartnerVm() + so.getMips());
@@ -188,6 +189,7 @@ public class CustomDatacenterBroker extends DatacenterBroker {
 				}
 				getScaleList().remove(0);
 				sendNow(getId(), CloudSimTags.BROKER_SCALE);
+				Log.printLine(getName() + ": processScale time:" + so.getScaleTime() + "-mips" + so.getMips());
 			}
 		}
 	}
@@ -199,9 +201,12 @@ public class CustomDatacenterBroker extends DatacenterBroker {
 				int partnerVm = pi.getPartnerVm();
 				double ownVm = getVmSize();
 				double newRatio = (partnerVm + so.getMips()) / ownVm;
-				
+	
+				Log.printLine(getName() + ": processPartnerScale ID:" + pi.getPartnerId() +" newRatio: " + (partnerVm + so.getMips()) +"/" + ownVm);
+
 				pi.setRatio(newRatio);
 				pi.setPartnerVm(partnerVm + so.getMips());
+
 				break;
 			}
 		}
