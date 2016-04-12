@@ -18,8 +18,8 @@ public class PartnerInfomation {
 	/**
 	 * L in argithorm
 	 */
-	private double lengthRatio;
-	
+    //	sendRecvRatio is an derivation value. Get it "ON THE GO" instead of storing
+
 	/**
 	 * l in argithorm
 	 */
@@ -27,13 +27,12 @@ public class PartnerInfomation {
 
 	
 	public PartnerInfomation(int partnerId, double ratio, double sentApps,
-			double receivedApps,double lengthRatio,  double kRatio) {
+			double receivedApps,double sendRecvRatio,  double kRatio) {
 		super();
 		this.partnerId = partnerId;
 		this.contractRatio = ratio;
 		this.sentApps = 0;
 		this.receivedApps = 0;
-		this.lengthRatio = lengthRatio;
 		this.kRatio = kRatio;
 	}
 
@@ -43,7 +42,7 @@ public class PartnerInfomation {
 		this.contractRatio = 1;
 		this.sentApps = 0;
 		this.receivedApps = 0;
-		this.lengthRatio = 0;
+//		this.sendRecvRatio = 0;
 		this.kRatio = 0;
 	}
 	
@@ -58,7 +57,6 @@ public class PartnerInfomation {
 			this.sentApps = partnerVm;
 			this.receivedApps = broker.getVmSize();
 		}
-		this.lengthRatio = ratio;
 		this.kRatio = 0;
 		this.broker = broker;
 		this.setPartnerVm(partnerVm);
@@ -78,27 +76,24 @@ public class PartnerInfomation {
 	@Override
 	public String toString() {
 		return "PartnerInfomation [partnerId=" + partnerId + ", ratio=" + contractRatio
-				+ ", sentApps=" + sentApps + ", receivedApps=" + receivedApps + "lengthRatio= " + lengthRatio + "]";
+				+ ", sentApps=" + sentApps + ", receivedApps=" + receivedApps + "sendRecvRatio= " + this.calcLenghtRatio() + "]";
 	}
 	
 	/**
-	 * deviation  =  ti so tong do dai dung dung i goi cho j tren tong do dai j goi cho i 
+	 * sendRecvRatio  =  ti so tong do dai dung dung i goi cho j tren tong do dai j goi cho i 
 	 * @param request_lenght
 	 * @param satify_lenght
 	 * @return
 	 */
 	public double updateLenghtRatio(double request_lenght,double satify_lenght){
-		double deviation;
-		deviation = calcLenghtRatio(this.getRequested(),this.getSatified());
-		setLenghtRatio(deviation);
-		return deviation;
+		updateRequested(request_lenght);
+		updateSatified(satify_lenght);
+
+		return calcLenghtRatio(this.getRequested(),this.getSatified());
 	}
 	
 	public double updateLenghtRatio(){
-		double deviation;
-		deviation = calcLenghtRatio(0,0);
-		setLenghtRatio(deviation);
-		return deviation;
+		return calcLenghtRatio();
 	}
 	
 	public double updateRequested(double request_lenght){
@@ -116,20 +111,22 @@ public class PartnerInfomation {
 	}
 	
 	public double calcLenghtRatio(double request_lenght,double satify_lenght){
-		double deviation;
+		double sendRecvRatio;
 		
 		if (getSatified() == 0 && getRequested() == 0) {
-			deviation = 0;
-		} else if (getSatified() == 0) {
-			deviation = (double) (getRequested() + request_lenght) / getPartnerVm();
-		} else if (getRequested() == 0) {
-			deviation = (double) getPartnerVm() / (getSatified() + satify_lenght);
+			sendRecvRatio = 0;
+		} else if (getSatified() == 0 && satify_lenght == 0) {
+			sendRecvRatio =  100000000; // huge value
 		} else {
-			deviation = (double) (getRequested() + request_lenght) / (this.getSatified() + satify_lenght);
+			sendRecvRatio = (double) (getRequested() + request_lenght) / (this.getSatified() + satify_lenght);
 		}
 		
-		return deviation;
+		return sendRecvRatio;
 	}
+
+    public double calcLenghtRatio(){
+    	return calcLenghtRatio(0,0);
+    }
 	
 	/**
 	 * K ratio = L/init_ratio
@@ -182,7 +179,6 @@ public class PartnerInfomation {
 
 	public void setRequested(double sentApps) {
 		this.sentApps = sentApps;
-		updateLenghtRatio();
 	}
 
 	public double getSatified() {
@@ -191,16 +187,15 @@ public class PartnerInfomation {
 
 	public void setSatified(double receivedApps) {
 		this.receivedApps = receivedApps;
-		updateLenghtRatio();
 	}
 
 	public double getLenghtRatio() {
-		return lengthRatio;
+		return this.calcLenghtRatio();
 	}
 
-	public void setLenghtRatio(double lengthRatio) {
-		this.lengthRatio = lengthRatio;
-	}
+//	public void setLenghtRatio(double sendRecvRatio) {
+//		this.sendRecvRatio = sendRecvRatio;
+//	}
 
 	/**
 	 * @return the kRatio
