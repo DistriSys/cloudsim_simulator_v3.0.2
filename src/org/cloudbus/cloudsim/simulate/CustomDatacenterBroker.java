@@ -139,11 +139,7 @@ public class CustomDatacenterBroker extends DatacenterBroker {
 //							+ ": Estimate cloudlet #" + cloudlet.getCloudletId() + " received at " + cloudlet.getUserRequestTime());
 					setEstimationStatus(RUNNING);
 					createCloudletObserve(cloudlet);
-					
-					if (cloudlet.getCloudletId() == 22000) {
-						Log.printLine("BREAK HERE");
-					}
-					
+				
 					for (Integer datacenterId: getDatacenterIdsList()) {
 						CustomResCloudlet rcl = new CustomResCloudlet(cloudlet);
 						sendNow(datacenterId, CloudSimTags.DATACENTER_ESTIMATE_TASK, rcl);
