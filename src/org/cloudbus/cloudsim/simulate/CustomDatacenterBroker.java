@@ -182,7 +182,7 @@ public class CustomDatacenterBroker extends DatacenterBroker {
 							double ourVm = getVmSize();
 							double newRatio = partnerVm / ourVm;
 
-							pi.setRatio(newRatio);
+							pi.setContractRatio(newRatio);
 							
 							sendNow(pi.getPartnerId(), CloudSimTags.PARTNER_SCALE, so);
 							Log.printLine(getName() + ": processScale ID:" + pi.getPartnerId() +" newRatio: " + partnerVm +"/" + ourVm);
@@ -209,7 +209,7 @@ public class CustomDatacenterBroker extends DatacenterBroker {
 	
 				Log.printLine(getName() + ": processPartnerScale ID:" + pi.getPartnerId() +" newRatio: " + (partnerVm + so.getMips()) +"/" + ownVm);
 
-				pi.setRatio(newRatio);
+				pi.setContractRatio(newRatio);
 				pi.setPartnerVm(partnerVm + so.getMips());
 
 				break;
