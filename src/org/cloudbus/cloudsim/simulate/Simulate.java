@@ -132,13 +132,15 @@ public class Simulate {
                     	int appendMips = createVmList(vmList, m_vm, broker, i);
                     	
             			ScaleObject newso = new ScaleObject(vmList, scaleTime, appendMips, true);
-            			
+
+            			/* Instead of using sorted support data structure
+            			 * We apply the sorted insertion approach 
+            			 */
             			for(ScaleObject so: broker.getScaleList()){
             				if (newso.getScaleTime() > so.getScaleTime())
             					 index++;
             			}
             			broker.getScaleList().add(index,newso);
-//            			broker.getScaleList().sort();
             		}
             	}
 
@@ -265,8 +267,7 @@ public class Simulate {
 	private static void createVm(List<Vm> vmList, JSONObject m_vm, CustomDatacenterBroker broker, int datacenterIndex) {
 			int appendMips = createVmList(vmList, m_vm, broker, datacenterIndex);
 			
-			broker.appendVmSize(appendMips);
-
+			broker.setVmSize(appendMips);
 	}
 
 	

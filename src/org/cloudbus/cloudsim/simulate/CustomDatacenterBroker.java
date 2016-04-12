@@ -172,10 +172,12 @@ public class CustomDatacenterBroker extends DatacenterBroker {
 				}
 				
 				/* In scaling, update Broker info */
+				Log.printLine(getName() + "has vmsize:" + this.getVmSize() + ": processScale addmips:" + so.getAppendMips() + "-add vmList" + so.getVmList().get(0).getMips());
+
 				int appendMips = so.getAppendMips();
 				this.submitVmList(so.getVmList());
 				this.appendVmSize(appendMips);
-				Log.printLine(getName() + ": processScale addmips:" + so.getAppendMips() + "-add vmList" + so.getVmList().get(0).getMips());
+				
 				for (ScaleObject sc: getScaleList())
 					Log.printLine(getName() + ": processScale list:" + sc.getScaleTime());
 				
@@ -184,11 +186,12 @@ public class CustomDatacenterBroker extends DatacenterBroker {
 						if (Simulate.USER_ALPHA_RATIO) {
 							int partnerVm = pi.getPartnerVm();
 							double ourVm = getVmSize();
-							double newRatio = partnerVm / (ourVm + so.getMips());
+							double newRatio = partnerVm / ourVm;
+
 							pi.setRatio(newRatio);
 							
 							sendNow(pi.getPartnerId(), CloudSimTags.PARTNER_SCALE, so);
-							Log.printLine(getName() + ": processScale ID:" + pi.getPartnerId() +" newRatio: " + partnerVm +"/" + (ourVm + so.getMips()));
+							Log.printLine(getName() + ": processScale ID:" + pi.getPartnerId() +" newRatio: " + partnerVm +"/" + ourVm);
 						} else {
 							// 1:1 ratio
 							pi.setPartnerVm(pi.getPartnerVm() + so.getMips());
@@ -196,10 +199,9 @@ public class CustomDatacenterBroker extends DatacenterBroker {
 					}
 				}
 				getScaleList().remove(0);
-//				sendNow(getId(), CloudSimTags.BROKER_SCALE);
-				Log.printLine(getName() + ": processScale time:" + so.getScaleTime() + "-mips" + so.getMips());
+				sendNow(getId(), CloudSimTags.BROKER_SCALE);
 			}
-			Log.printLine(CloudSim.clock() + getName() + ": processScale scaleTime: " + so.getScaleTime());
+//			Log.printLine(CloudSim.clock() + getName() + ": processScale scaleTime: " + so.getScaleTime());
 		}
 	}
 	

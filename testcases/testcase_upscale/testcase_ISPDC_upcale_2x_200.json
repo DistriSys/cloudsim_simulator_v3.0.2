@@ -22,7 +22,7 @@
         }
       },
       "vms": {
-        "quantity": 2,
+        "quantity": 1,
         "mips": 50,
         "size": 1000,
         "ram": 1024,
