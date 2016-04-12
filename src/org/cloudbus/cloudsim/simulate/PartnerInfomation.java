@@ -7,9 +7,9 @@ public class PartnerInfomation {
 	
 	private double contractRatio;
 	
-	private double requested;
+	private double sentApps;
 	
-	private double satified;
+	private double receivedApps;
 	
 	private int partnerVm;
 	
@@ -18,7 +18,7 @@ public class PartnerInfomation {
 	/**
 	 * L in argithorm
 	 */
-	private double lenghtRatio;
+	private double lengthRatio;
 	
 	/**
 	 * l in argithorm
@@ -26,14 +26,14 @@ public class PartnerInfomation {
 	private double kRatio;
 
 	
-	public PartnerInfomation(int partnerId, double ratio, double requested,
-			double satified,double lenghtRatio,  double kRatio) {
+	public PartnerInfomation(int partnerId, double ratio, double sentApps,
+			double receivedApps,double lengthRatio,  double kRatio) {
 		super();
 		this.partnerId = partnerId;
 		this.contractRatio = ratio;
-		this.requested = 0;
-		this.satified = 0;
-		this.lenghtRatio = lenghtRatio;
+		this.sentApps = 0;
+		this.receivedApps = 0;
+		this.lengthRatio = lengthRatio;
 		this.kRatio = kRatio;
 	}
 
@@ -41,9 +41,9 @@ public class PartnerInfomation {
 		super();
 		this.partnerId = partnerId;
 		this.contractRatio = 1;
-		this.requested = 0;
-		this.satified = 0;
-		this.lenghtRatio = 0;
+		this.sentApps = 0;
+		this.receivedApps = 0;
+		this.lengthRatio = 0;
 		this.kRatio = 0;
 	}
 	
@@ -52,13 +52,13 @@ public class PartnerInfomation {
 		this.partnerId = partnerId;
 		this.contractRatio = ratio;
 		if (ratio == 1) {
-			this.requested = 100;
-			this.satified = 100;
+			this.sentApps = 100;
+			this.receivedApps = 100;
 		} else {
-			this.requested = partnerVm;
-			this.satified = broker.getVmSize();
+			this.sentApps = partnerVm;
+			this.receivedApps = broker.getVmSize();
 		}
-		this.lenghtRatio = ratio;
+		this.lengthRatio = ratio;
 		this.kRatio = 0;
 		this.broker = broker;
 		this.setPartnerVm(partnerVm);
@@ -78,7 +78,7 @@ public class PartnerInfomation {
 	@Override
 	public String toString() {
 		return "PartnerInfomation [partnerId=" + partnerId + ", ratio=" + contractRatio
-				+ ", requested=" + requested + ", satified=" + satified + "lenghtRatio= " + lenghtRatio + "]";
+				+ ", sentApps=" + sentApps + ", receivedApps=" + receivedApps + "lengthRatio= " + lengthRatio + "]";
 	}
 	
 	/**
@@ -177,29 +177,29 @@ public class PartnerInfomation {
 	}
 
 	public double getRequested() {
-		return requested;
+		return sentApps;
 	}
 
-	public void setRequested(double requested) {
-		this.requested = requested;
+	public void setRequested(double sentApps) {
+		this.sentApps = sentApps;
 		updateLenghtRatio();
 	}
 
 	public double getSatified() {
-		return satified;
+		return receivedApps;
 	}
 
-	public void setSatified(double satified) {
-		this.satified = satified;
+	public void setSatified(double receivedApps) {
+		this.receivedApps = receivedApps;
 		updateLenghtRatio();
 	}
 
 	public double getLenghtRatio() {
-		return lenghtRatio;
+		return lengthRatio;
 	}
 
-	public void setLenghtRatio(double lenghtRatio) {
-		this.lenghtRatio = lenghtRatio;
+	public void setLenghtRatio(double lengthRatio) {
+		this.lengthRatio = lengthRatio;
 	}
 
 	/**
