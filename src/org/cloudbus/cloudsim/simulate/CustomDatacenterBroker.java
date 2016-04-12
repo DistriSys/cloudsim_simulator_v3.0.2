@@ -265,7 +265,7 @@ public class CustomDatacenterBroker extends DatacenterBroker {
 						CustomResCloudlet currResCloudlet = observe.getResCloudlet();
 						Cloudlet currCloudlet = currResCloudlet.getCloudlet();
 
-//						if (currResCloudlet.getMaxProcessable() == 0) {
+/*						if (currResCloudlet.getMaxProcessable() == 0) { */
 							sendPartnerRequest(currCloudlet);
 /*						} else {
 							// create new cloudlet to ask for partner help
