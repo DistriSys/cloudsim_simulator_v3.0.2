@@ -171,6 +171,14 @@ public class CustomDatacenterBroker extends DatacenterBroker {
 					sendNow(datacenterId, CloudSimTags.DATACENTER_SCALE, so);
 				}
 				
+				/* In scaling, update Broker info */
+				int appendMips = so.getAppendMips();
+				this.submitVmList(so.getVmList());
+				this.appendVmSize(appendMips);
+				Log.printLine(getName() + ": processScale addmips:" + so.getAppendMips() + "-add vmList" + so.getVmList().get(0).getMips());
+				for (ScaleObject sc: getScaleList())
+					Log.printLine(getName() + ": processScale list:" + sc.getScaleTime());
+				
 				if (Simulate.UPDATE_SCALE_PARTNER) {
 					for (PartnerInfomation pi: getPartnersList()) {
 						if (Simulate.USER_ALPHA_RATIO) {
@@ -188,9 +196,10 @@ public class CustomDatacenterBroker extends DatacenterBroker {
 					}
 				}
 				getScaleList().remove(0);
-				sendNow(getId(), CloudSimTags.BROKER_SCALE);
+//				sendNow(getId(), CloudSimTags.BROKER_SCALE);
 				Log.printLine(getName() + ": processScale time:" + so.getScaleTime() + "-mips" + so.getMips());
 			}
+			Log.printLine(CloudSim.clock() + getName() + ": processScale scaleTime: " + so.getScaleTime());
 		}
 	}
 	

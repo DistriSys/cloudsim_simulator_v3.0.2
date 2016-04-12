@@ -22,7 +22,7 @@
         }
       },
       "vms": {
-        "quantity": 1,
+        "quantity": 2,
         "mips": 50,
         "size": 1000,
         "ram": 1024,
@@ -484,9 +484,17 @@
       }
     ],
     "scale": [
-      {
-        "mips": 200,
-        "scaleTime": 250
+        {
+        "scaleTime": 250,
+        "vms": {
+          "quantity": 1,
+          "mips": 50,
+          "size": 1000,
+          "ram": 1024,
+          "bw": 10,
+          "pesNumber": 1,
+          "vmm": "Xen"
+        }
       }
     ]
   },
@@ -975,9 +983,17 @@
       }
     ],
     "scale": [
-      {
-        "mips": 200,
-        "scaleTime": 250
+        {
+        "scaleTime": 250,
+        "vms": {
+          "quantity": 1,
+          "mips": 50,
+          "size": 1000,
+          "ram": 1024,
+          "bw": 10,
+          "pesNumber": 1,
+          "vmm": "Xen"
+        }
       }
     ]
   },
@@ -1467,8 +1483,40 @@
     ],
     "scale": [
       {
-        "mips": 200,
-        "scaleTime": 250
+        "scaleTime": 150,
+        "vms": {
+          "quantity": 1,
+          "mips": 50,
+          "size": 1000,
+          "ram": 1024,
+          "bw": 10,
+          "pesNumber": 1,
+          "vmm": "Xen"
+        }
+      },
+      {
+        "scaleTime": 550,
+        "vms": {
+          "quantity": 1,
+          "mips": 50,
+          "size": 1000,
+          "ram": 1024,
+          "bw": 10,
+          "pesNumber": 1,
+          "vmm": "Xen"
+        }
+      },
+      {
+        "scaleTime": 750,
+        "vms": {
+          "quantity": 1,
+          "mips": 50,
+          "size": 1000,
+          "ram": 1024,
+          "bw": 10,
+          "pesNumber": 1,
+          "vmm": "Xen"
+        }
       }
     ]
   },

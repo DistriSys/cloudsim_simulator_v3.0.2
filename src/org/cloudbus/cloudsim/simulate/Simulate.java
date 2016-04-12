@@ -34,7 +34,7 @@ import org.json.simple.parser.JSONParser;
  */
 public class Simulate {
 	
-	private static final String testcaseFilePath = "D:\\PD Nguyen\\workspace\\2016ISPDC\\testcases\\testcase_ISPDC_paper_100step.json";
+	private static final String testcaseFilePath = "D:\\PD Nguyen\\workspace\\2016ISPDC\\testcases\\testcase_upscale\\testcase_ISPDC_upcale_2x_200.json";
 //	private static final String testcaseFilePath = "/home/ngtrieuvi92/zz/eclipse/cloudsim_simulator_v2.0/testcases/testcase_1.json";
 	
 	/**
@@ -123,9 +123,22 @@ public class Simulate {
             	JSONArray scaleArr = (JSONArray) member.get("scale");
             	if (scaleArr != null) {
             		for (int j = 0; j < scaleArr.size(); j++) {
+            			int index = 0;
             			JSONObject m_scale = (JSONObject) scaleArr.get(j);
-            			int mips = ((Long) m_scale.get("mips")).intValue();
             			double scaleTime = ((Long) m_scale.get("scaleTime")).doubleValue();
+
+            			List<Vm> vmList = new ArrayList<Vm>();
+                    	JSONObject m_vm = (JSONObject) m_scale.get("vms");
+                    	int appendMips = createVmList(vmList, m_vm, broker, i);
+                    	
+            			ScaleObject newso = new ScaleObject(vmList, scaleTime, appendMips, true);
+            			
+            			for(ScaleObject so: broker.getScaleList()){
+            				if (newso.getScaleTime() > so.getScaleTime())
+            					 index++;
+            			}
+            			broker.getScaleList().add(index,newso);
+//            			broker.getScaleList().sort();
             		}
             	}
 
@@ -218,7 +231,8 @@ public class Simulate {
 		}
 	}
 	
-	private static void createVm(List<Vm> vmList, JSONObject m_vm, CustomDatacenterBroker broker, int datacenterIndex) {
+	private static int createVmList(List<Vm> vmList, JSONObject m_vm, CustomDatacenterBroker broker, int datacenterIndex) {
+		int total_mips = 0;
 		String brokerName = broker.getName();
 		int vm_quantity = ((Long) m_vm.get("quantity")).intValue();
 		int vmId_prefix = broker.getId() * 1000 + datacenterIndex * 100;
@@ -239,11 +253,20 @@ public class Simulate {
 					scheduler);
 			
 			vmList.add(vm);
-			
-			broker.appendVmSize(mips);
 
+			total_mips += mips;
+			
 			Log.printLine(brokerName + ": creating Vm #" + vmId);
 		}
+
+		return total_mips;
+	}
+
+	private static void createVm(List<Vm> vmList, JSONObject m_vm, CustomDatacenterBroker broker, int datacenterIndex) {
+			int appendMips = createVmList(vmList, m_vm, broker, datacenterIndex);
+			
+			broker.appendVmSize(appendMips);
+
 	}
 
 	
