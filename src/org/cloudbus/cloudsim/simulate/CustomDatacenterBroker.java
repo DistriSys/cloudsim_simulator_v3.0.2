@@ -182,7 +182,7 @@ public class CustomDatacenterBroker extends DatacenterBroker {
 							double ourVm = getVmSize();
 							double newRatio = partnerVm / ourVm;
 
-							pi.setContractRatio(newRatio);
+							pi.setContractRatio(partnerVm, ourVm);
 							
 							sendNow(pi.getPartnerId(), CloudSimTags.PARTNER_SCALE, so);
 							Log.printLine(getName() + ": processScale ID:" + pi.getPartnerId() +" newRatio: " + partnerVm +"/" + ourVm);
@@ -209,7 +209,7 @@ public class CustomDatacenterBroker extends DatacenterBroker {
 	
 				Log.printLine(getName() + ": processPartnerScale ID:" + pi.getPartnerId() +" newRatio: " + (partnerVm + so.getMips()) +"/" + ownVm);
 
-				pi.setContractRatio(newRatio);
+				pi.setContractRatio(partnerVm + so.getMips(), ownVm);
 				pi.setPartnerVm(partnerVm + so.getMips());
 
 				break;
@@ -473,11 +473,11 @@ public class CustomDatacenterBroker extends DatacenterBroker {
 		for(SimEntity en: entityList){
 			PartnerInfomation partnerInfoItem = null;
 			if (en instanceof CustomDatacenterBroker  && en.getId() != getId()) {
-				CustomDatacenterBroker item = (CustomDatacenterBroker) en;
-				int item_size = (int) item.getVmSize();
+				CustomDatacenterBroker partner = (CustomDatacenterBroker) en;
+				int partner_size = (int) partner.getVmSize();
 				if(Simulate.USER_ALPHA_RATIO){
-					double alphaRatio = (double)item_size/getVmSize();
-					partnerInfoItem   = new PartnerInfomation(en.getId(), alphaRatio, item_size, this);
+					double contractRatio = (double)partner_size/getVmSize();
+					partnerInfoItem   = new PartnerInfomation(en.getId(), contractRatio, partner_size, this);
 				}
 				else {
 					partnerInfoItem   = new PartnerInfomation(en.getId(), 1, (int)getVmSize(), this);
