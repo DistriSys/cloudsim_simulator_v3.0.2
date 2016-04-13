@@ -11,7 +11,8 @@ public class PartnerInfomation {
 	
 	private double receivedApps;
 	
-	private int partnerVm;
+	private double partnerVm;
+	private double ownVm;
 	
 	private CustomDatacenterBroker broker;
 	
@@ -42,7 +43,6 @@ public class PartnerInfomation {
 		this.contractRatio = 1;
 		this.sentApps = 0;
 		this.receivedApps = 0;
-//		this.sendRecvRatio = 0;
 		this.kRatio = 0;
 	}
 	
@@ -63,14 +63,19 @@ public class PartnerInfomation {
 	}
 	
 	public double numOfTaskCanSatisfy() {
-//		double maxSatisfiable = (getRequested() + broker.getVmSize()) / getRatio();
-		double maxSatisfiable = getRequested() / getContractRatio() + broker.getVmSize();
-		return maxSatisfiable - getSatified();
+//OLD		double maxSatisfiable = (getRequested() + broker.getVmSize()) / getRatio();
+//		double maxSatisfiable = getRequested() / getContractRatio() + broker.getVmSize();
+//		return maxSatisfiable - getSatified();
+		double ret = 0.5*partnerVm + getRequested()/getContractRatio();;
+		return ret - getSatified();
 	}
 	
 	public double numOfTaskCanRequest() {
-		double maxRequestable =(getSatified() + broker.getVmSize()) * getContractRatio(); 
-		return maxRequestable - getRequested();
+//		double maxRequestable =(getSatified() + broker.getVmSize()) * getContractRatio(); 
+
+//		return maxRequestable - getRequested();
+		double ret = 2*partnerVm + getSatified()*getContractRatio(); 
+		return ret - getRequested();
 	}
 
 	@Override
@@ -116,7 +121,7 @@ public class PartnerInfomation {
 		if (getSatified() == 0 && getRequested() == 0) {
 			sendRecvRatio = 0;
 		} else if (getSatified() == 0 && satify_lenght == 0) {
-			sendRecvRatio =  100000000; // huge value
+			sendRecvRatio =  1000000000; // huge value
 		} else {
 			sendRecvRatio = (double) (getRequested() + request_lenght) / (this.getSatified() + satify_lenght);
 		}
@@ -134,8 +139,8 @@ public class PartnerInfomation {
 	 */
 	public double getKRatio() {
 		double k;
-		if(this.getContractRatio() == 0 ){
-			k = 1;
+		if(this.getContractRatio() > -0.0001 && this.getContractRatio() < 0.0001 ){
+			k = 1000000000;
 		} else {
 			k = getLenghtRatio()/getContractRatio() - 1;
 		}
@@ -144,8 +149,8 @@ public class PartnerInfomation {
 	
 	public double getKRatioWithCurrentTask(double request_lenght,double satify_lenght) {
 		double k;
-		if(this.getContractRatio() == 0 ){
-			k = 1;
+		if(this.getContractRatio() > -0.0001 && this.getContractRatio() < 0.0001 ){
+			k = 1000000000;
 		} else {
 			k = (calcLenghtRatio(request_lenght, satify_lenght))/getContractRatio()-1;
 		}
@@ -169,8 +174,10 @@ public class PartnerInfomation {
 		return contractRatio;
 	}
 
-	public void setContractRatio(double ratio) {
-		this.contractRatio = ratio;
+	public void setContractRatio(double partnerVm, double ownVm) {
+		this.partnerVm = partnerVm;
+		this.ownVm = ownVm;
+		this.contractRatio = partnerVm/ownVm;
 	}
 
 	public double getRequested() {
@@ -213,7 +220,7 @@ public class PartnerInfomation {
 	}
 
 	public int getPartnerVm() {
-		return partnerVm;
+		return (int) partnerVm;
 	}
 
 	public void setPartnerVm(int partnerVm) {
@@ -229,7 +236,9 @@ public class PartnerInfomation {
 	}
 	
 	public boolean isBalance() {
-		return (getLenghtRatio() - getContractRatio()) == 0;
+		double delta = (double) getLenghtRatio() - getContractRatio();
+		/* To avoid decimal, we replace number equal 0 by epsilon range compare*/
+		return delta > -0.0001 && delta < 0.001;
 	}
 
 }
