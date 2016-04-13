@@ -7,9 +7,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.cloudbus.cloudsim.Cloudlet;
+import org.cloudbus.cloudsim.CloudletScheduler;
 import org.cloudbus.cloudsim.DatacenterBroker;
 import org.cloudbus.cloudsim.DatacenterCharacteristics;
 import org.cloudbus.cloudsim.Log;
+import org.cloudbus.cloudsim.Vm;
 import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.core.CloudSimTags;
 import org.cloudbus.cloudsim.core.SimEntity;
@@ -262,42 +264,18 @@ public class CustomDatacenterBroker extends DatacenterBroker {
 //						Log.printLine(CloudSim.clock() + ":" + getName() + ": WE NEED HELP FROM PARTNER #"
 //								+ observe.getResCloudlet().getCloudlet().getCloudletId());
 						
-						CustomResCloudlet currResCloudlet = observe.getResCloudlet();
-						Cloudlet currCloudlet = currResCloudlet.getCloudlet();
+						CustomResCloudlet rcl = observe.getResCloudlet();
+						Cloudlet cl = rcl.getCloudlet();
+						int[] esl = estimateBestPartner(rcl);
+						if(esl[0] != -1 && esl[1]!=-1){
+							Log.printLine(getName() + "sent Cloudlet: #" + cl.getCloudletId() + " Datacenter: " + esl[0] + " on Vm: " + esl[1]);						
 
-						double new_k=1000000000, selected_k=-2;
-						PartnerInfomation best=null;
-						//* INIT BY GET THE MINIMUM k */
-						for (PartnerInfomation pi: getPartnersList()) {
-							if (selected_k < pi.getKRatioWithCurrentTask(currCloudlet.getCloudletLength(), 0)){
-								selected_k = pi.getKRatioWithCurrentTask(currCloudlet.getCloudletLength(), 0);
-							    best = pi;
-							}
-						}
-						Log.printLine(getName() + " CHUBE sent Cloudlet: init slected_k: " + selected_k + " Cloudlet: " + currCloudlet.getCloudletId());
-						List<PartnerInfomation> sentPartner = new ArrayList<PartnerInfomation>();
-						for (PartnerInfomation pi: getPartnersList()) {
-							new_k = pi.getKRatioWithCurrentTask(currCloudlet.getCloudletLength(), 0);
-							if( new_k < selected_k && new_k < 2 && new_k > -1){
-								selected_k = new_k;
-								best=pi;
-							}
-						}
-						if(best != null){
-						   updatePartnerInformation(best);
-
-							sendNow(best.getPartnerId(), CloudSimTags.PARTNER_ESTIMATE_REQUEST, currResCloudlet);
-							sentPartner.add(best);
-							EstimationCloudletOfPartner estPartner = new EstimationCloudletOfPartner(new CustomResCloudlet(currCloudlet), 
-									sentPartner ,partnersList);
-							getEstimateCloudletofParnerMap().put(currCloudlet.getCloudletId(), estPartner);
-						    sendExecRequest(currResCloudlet.getBestDatacenterId(), currResCloudlet.getBestVmId(), currResCloudlet);
-						   Log.printLine(getName() + " CHUBE sent Cloudlet: " + currCloudlet.getCloudletId() + " to partner: " + best.getPartnerId()+ 
-								   " | bestDatacenterId: "+ currResCloudlet.getBestDatacenterId() + " | bestVm: " + currResCloudlet.getBestVmId() +
-								   "kratio: " + selected_k);
-						   
+							rcl.setBestDatacenterId(esl[0]);
+							rcl.setBestVmId(esl[1]);
+							rcl.getCloudlet().setVmId(rcl.getBestVmId());
+							sendNow(rcl.getBestDatacenterId(), CloudSimTags.DATACENTER_EXEC_OUTSITETASK,rcl);
 						} else {
-								sendPartnerRequest(currCloudlet);
+							sendPartnerRequest(cl);
 						}
 					}
 
@@ -313,7 +291,65 @@ public class CustomDatacenterBroker extends DatacenterBroker {
 			}
 		}
 	}
-	
+
+	private int[] estimateBestPartner(CustomResCloudlet rcl){
+		int[] estimated_partner = new int[2];
+		estimated_partner[0] = -1;
+		estimated_partner[1] = -1;
+		
+		Cloudlet cl = rcl.getCloudlet();
+		double new_k=1000000000, selected_k=-2;
+		PartnerInfomation best=null;
+		//* INIT BY GET THE MINIMUM k */
+		for (PartnerInfomation pi: getPartnersList()) {
+			if (selected_k < pi.getKRatioWithCurrentTask(rcl.getCloudletLength(), 0)){
+				selected_k = pi.getKRatioWithCurrentTask(rcl.getCloudletLength(), 0);
+			    best = pi;
+			}
+		}
+		for (PartnerInfomation pi: getPartnersList()) {
+			Vm bestVm = null;
+			new_k = pi.getKRatioWithCurrentTask(rcl.getCloudletLength(), 0);
+			if( new_k < selected_k && new_k < 2 && new_k > -1){
+				selected_k = new_k;
+				best=pi;
+			}
+		
+			if(best != null){
+				// time to transfer the files
+				//double fileTransferTime = best.getBroker().getDatacenterIdsList().get(0).predictFileTransferTime(rcl.getRequiredFiles());
+				List<Vm> vmList = best.getBroker().getVmList();
+				
+				long maxProcessable = 0;
+				for (Vm vm: vmList) {
+					CloudletScheduler scheduler = vm.getCloudletScheduler();
+					double mips = vm.getMips();
+					double[] estimatedResult = scheduler.cloudletEstimate(cl, 0, mips);
+					
+					if (estimatedResult[1] > maxProcessable) {
+						maxProcessable = (long) estimatedResult[1];
+						bestVm = vm;
+					}
+				}
+				rcl.setMaxProcessable(maxProcessable);
+				if (bestVm != null) {
+					rcl.setBestVmId(bestVm.getId());
+				} else {
+					rcl.setBestVmId(-1);
+				}							
+
+				if(bestVm != null){ 
+					updatePartnerInformation(best);
+					estimated_partner[0] = best.getBroker().getDatacenterIdsList().get(0);
+					estimated_partner[1] = bestVm.getId();
+					return estimated_partner;
+				}
+			} 
+		}		
+
+		return estimated_partner;
+	}
+
 	private void processPartnerCloudletExecRequest(SimEvent ev) {
 		CustomResCloudlet rcl = (CustomResCloudlet) ev.getData();
 		

@@ -169,7 +169,12 @@ public class CustomDatacenter extends Datacenter {
 			case CloudSimTags.DATACENTER_CANCEL_ESTIMATED_TASK:
 				cancelEstimateTask(ev);
 				break;
-				
+
+			case CloudSimTags.DATACENTER_EXEC_OUTSITETASK:
+				updateCloudletProcessing();
+				processOutsideTask(ev);
+				break;
+
 			case CloudSimTags.DATACENTER_EXEC_TASK:
 				updateCloudletProcessing();
 				processTask(ev);
@@ -256,6 +261,23 @@ public class CustomDatacenter extends Datacenter {
 		int vmId = (int) ev.getData();
 		for (Vm vm: getVmList()) {
 			if (vm.getId() == vmId) {
+				vm.getCloudletScheduler().getLastEstimated().getCloudlet().setResourceParameter(getId(), 
+						getCharacteristics().getCostPerSecond(), getCharacteristics().getCostPerBw());
+				double time = vm.getCloudletScheduler().moveEstimatedCloudlet(vm.getId());
+				if (time > 0) {
+					send(getId(), time, CloudSimTags.VM_DATACENTER_EVENT);
+				}
+				break;
+			}
+		}
+	}
+
+	private void processOutsideTask(SimEvent ev) {
+		CustomResCloudlet rcl = (CustomResCloudlet) ev.getData();
+		int vmId = (int) rcl.getBestVmId();
+		for (Vm vm: getVmList()) {
+			if (vm.getId() == vmId) {
+				vm.getCloudletScheduler().setLastEstimated(rcl);
 				vm.getCloudletScheduler().getLastEstimated().getCloudlet().setResourceParameter(getId(), 
 						getCharacteristics().getCostPerSecond(), getCharacteristics().getCostPerBw());
 				double time = vm.getCloudletScheduler().moveEstimatedCloudlet(vm.getId());
