@@ -8,6 +8,7 @@ import org.cloudbus.cloudsim.CloudletSchedulerSpaceShared;
 import org.cloudbus.cloudsim.Datacenter;
 import org.cloudbus.cloudsim.DatacenterCharacteristics;
 import org.cloudbus.cloudsim.Host;
+import org.cloudbus.cloudsim.Log;
 import org.cloudbus.cloudsim.Storage;
 import org.cloudbus.cloudsim.Vm;
 import org.cloudbus.cloudsim.VmAllocationPolicy;
@@ -17,6 +18,13 @@ import org.cloudbus.cloudsim.core.SimEvent;
 public class CustomDatacenter extends Datacenter {
 	private int datacenterBrokerId;
 
+	private int log_level = 3;
+	
+	private void printLog(int level, String message){
+		if(level > log_level)
+			Log.print(message);
+	}
+	
 	public CustomDatacenter(String name,
 			DatacenterCharacteristics characteristics,
 			VmAllocationPolicy vmAllocationPolicy, List<Storage> storageList,
@@ -194,7 +202,7 @@ public class CustomDatacenter extends Datacenter {
 	private void estimateTask(SimEvent ev) {
 		CustomResCloudlet rcl = (CustomResCloudlet) ev.getData();
 		Cloudlet cl = rcl.getCloudlet();
-//		Log.printLine(CloudSim.clock()+ " estimating task #"+cl.getCloudletId()+ "; user request time "+ cl.getUserRequestTime());		
+		printLog(3, getName()+ " estimateTask #"+cl.getCloudletId()+ "; user request time "+ cl.getUserRequestTime());		
 		// time to transfer the files
 		double fileTransferTime = predictFileTransferTime(cl.getRequiredFiles());
 
@@ -206,10 +214,11 @@ public class CustomDatacenter extends Datacenter {
 			double[] estimatedResult = scheduler.cloudletEstimate(cl, fileTransferTime, mips);
 			
 			if (estimatedResult[1] > maxProcessable) {
+				printLog(2, "cloudlet # "+ cl.getCloudletId()+ " assigned on Vm " +vm.getId());
 				vm.getCloudletScheduler().setLastEstimated(null);
 				maxProcessable = (long) estimatedResult[1];
 				bestVm = vm;
-				bestVm.getCloudletScheduler().setLastEstimated(rcl);
+				vm.getCloudletScheduler().setLastEstimated(rcl);
 			}
 		}
 		rcl.setMaxProcessable(maxProcessable);
@@ -261,6 +270,7 @@ public class CustomDatacenter extends Datacenter {
 		int vmId = (int) ev.getData();
 		for (Vm vm: getVmList()) {
 			if (vm.getId() == vmId) {
+				printLog(3, getName() + ": processTask on VmId " + vmId + " item "+vm.getCloudletScheduler().getLastEstimated());
 				vm.getCloudletScheduler().getLastEstimated().getCloudlet().setResourceParameter(getId(), 
 						getCharacteristics().getCostPerSecond(), getCharacteristics().getCostPerBw());
 				double time = vm.getCloudletScheduler().moveEstimatedCloudlet(vm.getId());
@@ -274,9 +284,13 @@ public class CustomDatacenter extends Datacenter {
 
 	private void processOutsideTask(SimEvent ev) {
 		CustomResCloudlet rcl = (CustomResCloudlet) ev.getData();
+		CustomResCloudlet old_rcl;
 		int vmId = (int) rcl.getBestVmId();
 		for (Vm vm: getVmList()) {
 			if (vm.getId() == vmId) {
+				printLog(3, getName() + ": processOutsiteTask on VmId " + vmId + " item "+vm.getCloudletScheduler().getLastEstimated());
+
+				old_rcl = vm.getCloudletScheduler().getLastEstimated();
 				vm.getCloudletScheduler().setLastEstimated(rcl);
 				vm.getCloudletScheduler().getLastEstimated().getCloudlet().setResourceParameter(getId(), 
 						getCharacteristics().getCostPerSecond(), getCharacteristics().getCostPerBw());
@@ -284,6 +298,7 @@ public class CustomDatacenter extends Datacenter {
 				if (time > 0) {
 					send(getId(), time, CloudSimTags.VM_DATACENTER_EVENT);
 				}
+				vm.getCloudletScheduler().setLastEstimated(old_rcl);
 				break;
 			}
 		}

@@ -74,7 +74,7 @@ public class Simulate {
 
             JSONParser jsonParser = new JSONParser();
             JSONArray members = (JSONArray) jsonParser.parse(reader);
-            
+
             // Create Datacenterbrokers
             for (int i = 0; i < members.size(); i++) {
             	JSONObject member = (JSONObject) members.get(i);
@@ -100,7 +100,7 @@ public class Simulate {
             	for (int j = 0; j < m_cloudlets.size(); j++) {
             		JSONObject m_cloudlet = (JSONObject) m_cloudlets.get(j);
 	            	int cloudlet_quantity = ((Long) m_cloudlet.get("quantity")).intValue();
-	            	int cloudletId_prefix = broker.getId() * 10000 + j * 1000;
+	            	int cloudletId_prefix = broker.getId() * 1000000 + j * 1000;
 	            	
 	        		long length = (Long) m_cloudlet.get("long");
 	        		if (cloudletLength == 0) cloudletLength = (int) length;
@@ -369,7 +369,7 @@ public class Simulate {
 		for (int i = 0; i < totalPartner; i++) {
 			PartnerInfomation pInfo = partnerInfo.get(i);
 //			Log.printLine(pInfo.getPartnerId()+":"+pInfo.getkRatio());
-			totalKRatio += pInfo.getkRatio();
+			totalKRatio += pInfo.getKRatio();
 //			Log.printLine(pInfo.getRequested() + " / " + pInfo.getSatified());
 		}
 		
@@ -411,7 +411,7 @@ public class Simulate {
 			for (int i = 0; i < partnerInfo.size(); i++) {
 				PartnerInfomation pInfo = partnerInfo.get(i);
 //				Log.printLine(pInfo.getPartnerId()+":"+pInfo.getkRatio());
-				total_partner_k_ratio += Math.abs(pInfo.getkRatio());
+				total_partner_k_ratio += Math.abs(pInfo.getKRatio());
 			}
 		}
 		

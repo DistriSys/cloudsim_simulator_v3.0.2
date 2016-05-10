@@ -5,37 +5,20 @@ public class PartnerInfomation {
 
 	private int partnerId;
 	
-	private double contractRatio;
+	private double contractRatio = -1000000;
 	
 	private double sentApps;
 	
 	private double receivedApps;
 	
 	private double partnerVm;
-	private double ownVm;
 	
 	private CustomDatacenterBroker broker;
 	
 	/**
-	 * L in argithorm
+	 * L in algorithm
 	 */
     //	sendRecvRatio is an derivation value. Get it "ON THE GO" instead of storing
-
-	/**
-	 * l in argithorm
-	 */
-	private double kRatio;
-
-	
-	public PartnerInfomation(int partnerId, double ratio, double sentApps,
-			double receivedApps,double sendRecvRatio,  double kRatio) {
-		super();
-		this.partnerId = partnerId;
-		this.contractRatio = ratio;
-		this.sentApps = 0;
-		this.receivedApps = 0;
-		this.kRatio = kRatio;
-	}
 
 	public PartnerInfomation(int partnerId) {
 		super();
@@ -43,7 +26,6 @@ public class PartnerInfomation {
 		this.contractRatio = 1;
 		this.sentApps = 0;
 		this.receivedApps = 0;
-		this.kRatio = 0;
 	}
 	
 	public PartnerInfomation(int partnerId, double ratio, int partnerVm, CustomDatacenterBroker broker) {
@@ -57,31 +39,24 @@ public class PartnerInfomation {
 			this.sentApps = partnerVm;
 			this.receivedApps = broker.getVmSize();
 		}
-		this.kRatio = 0;
 		this.broker = broker;
 		this.setPartnerVm(partnerVm);
 	}
 	
 	public double numOfTaskCanSatisfy() {
-//OLD		double maxSatisfiable = (getRequested() + broker.getVmSize()) / getRatio();
-//		double maxSatisfiable = getRequested() / getContractRatio() + broker.getVmSize();
-//		return maxSatisfiable - getSatified();
-		double ret = 0.5*partnerVm + getRequested()/getContractRatio();;
-		return ret - getSatified();
+		double maxSatisfiable = getRequested()/getContractRatio();;
+		return maxSatisfiable - getSatified();
 	}
 	
 	public double numOfTaskCanRequest() {
-//		double maxRequestable =(getSatified() + broker.getVmSize()) * getContractRatio(); 
-
-//		return maxRequestable - getRequested();
-		double ret = 2*partnerVm + getSatified()*getContractRatio(); 
-		return ret - getRequested();
+		double maxRequestable = getSatified()*getContractRatio(); 
+		return maxRequestable - getRequested();
 	}
 
 	@Override
 	public String toString() {
-		return "PartnerInfomation [partnerId=" + partnerId + ", ratio=" + contractRatio
-				+ ", sentApps=" + sentApps + ", receivedApps=" + receivedApps + "sendRecvRatio= " + this.calcLenghtRatio() + "]";
+		return "PartnerInfomation [partnerId=" + partnerId + ", contractRatio=" + contractRatio
+				+ ", sentApps=" + sentApps + ", receivedApps=" + receivedApps + ", kRatio= " + this.getKRatio() + "]";
 	}
 	
 	/**
@@ -110,16 +85,12 @@ public class PartnerInfomation {
 		setSatified(getSatified()+satify_lenght);
 		return getSatified();
 	}
-	public double updateKRatio(){
-		setkRatio(getKRatio());
-		return getKRatio();
-	}
 	
 	public double calcLenghtRatio(double request_lenght,double satify_lenght){
 		double sendRecvRatio;
 		
 		if (getSatified() == 0 && getRequested() == 0) {
-			sendRecvRatio = 0;
+			sendRecvRatio = 1;
 		} else if (getSatified() == 0 && satify_lenght == 0) {
 			sendRecvRatio =  1000000000; // huge value
 		} else {
@@ -139,8 +110,8 @@ public class PartnerInfomation {
 	 */
 	public double getKRatio() {
 		double k;
-		if(this.getContractRatio() > -0.0001 && this.getContractRatio() < 0.0001 ){
-			k = 1000000000;
+		if(this.getContractRatio() == -1000000 ){
+			k = 0;
 		} else {
 			k = getLenghtRatio()/getContractRatio() - 1;
 		}
@@ -149,10 +120,10 @@ public class PartnerInfomation {
 	
 	public double getKRatioWithCurrentTask(double request_lenght,double satify_lenght) {
 		double k;
-		if(this.getContractRatio() > -0.0001 && this.getContractRatio() < 0.0001 ){
-			k = 1000000000;
+		if(this.getContractRatio() == -1000000){
+			k = 0;
 		} else {
-			k = (calcLenghtRatio(request_lenght, satify_lenght))/getContractRatio()-1;
+			k = (calcLenghtRatio(getRequested()+request_lenght, getSatified()+satify_lenght))/getContractRatio()-1;
 		}
 		return k;
 	}
@@ -198,25 +169,6 @@ public class PartnerInfomation {
 
 	public double getLenghtRatio() {
 		return this.calcLenghtRatio();
-	}
-
-//	public void setLenghtRatio(double sendRecvRatio) {
-//		this.sendRecvRatio = sendRecvRatio;
-//	}
-
-	/**
-	 * @return the kRatio
-	 */
-	public double getkRatio() {
-		return kRatio;
-	}
-
-	/**
-	 * @param kRatio the kRatio to set
-	 */
-	public double setkRatio(double kRatio) {
-		this.kRatio = kRatio;
-		return this.kRatio;
 	}
 
 	public int getPartnerVm() {
