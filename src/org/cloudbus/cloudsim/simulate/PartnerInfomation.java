@@ -12,6 +12,7 @@ public class PartnerInfomation {
 	private double receivedApps;
 	
 	private double partnerVm;
+	private double ownVm;
 	
 	private CustomDatacenterBroker broker;
 	
@@ -24,21 +25,16 @@ public class PartnerInfomation {
 		super();
 		this.partnerId = partnerId;
 		this.contractRatio = 1;
-		this.sentApps = 0;
-		this.receivedApps = 0;
+		this.sentApps = 1;
+		this.receivedApps = 1;
 	}
 	
 	public PartnerInfomation(int partnerId, double ratio, int partnerVm, CustomDatacenterBroker broker) {
 		super();
 		this.partnerId = partnerId;
 		this.contractRatio = ratio;
-		if (ratio == 1) {
-			this.sentApps = 100;
-			this.receivedApps = 100;
-		} else {
-			this.sentApps = partnerVm;
-			this.receivedApps = broker.getVmSize();
-		}
+		this.sentApps = 100;
+		this.receivedApps = 100;
 		this.broker = broker;
 		this.setPartnerVm(partnerVm);
 	}

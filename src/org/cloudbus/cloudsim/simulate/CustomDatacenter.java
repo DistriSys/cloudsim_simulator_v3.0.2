@@ -22,7 +22,7 @@ public class CustomDatacenter extends Datacenter {
 	
 	private void printLog(int level, String message){
 		if(level > log_level)
-			Log.print(message);
+			Log.printLine(message);
 	}
 	
 	public CustomDatacenter(String name,
