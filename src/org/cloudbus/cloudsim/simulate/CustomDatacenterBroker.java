@@ -32,11 +32,11 @@ public class CustomDatacenterBroker extends DatacenterBroker {
 	private double vmSize = 0;
 	protected Map<Integer,EstimationCloudletOfPartner> estimateCloudletofParnerMap;
 	
-	private int log_level = 3;
+	private int log_level = 0;
 	
 	private void printLog(int level, String message){
 		if(level > log_level)
-			Log.print(message);
+			Log.printLine(message);
 	}
 	public CustomDatacenterBroker(String name) throws Exception {
 		super(name);
