@@ -297,6 +297,8 @@ public class CloudSimTags {
 	public static final int DATACENTER_EXEC_OUTSITETASK = BASE + 62;
 
 	public static final int BROKER_UPDATE_RECEIVE_OUTSITETASK = BASE + 63;
+
+	public static final int PARTNER_SENDBACK_FORCING = BASE + 64;
 	/** Private Constructor */
 	private CloudSimTags() {
 		throw new UnsupportedOperationException("CloudSim Tags cannot be instantiated");
