@@ -341,7 +341,11 @@ public class CustomDatacenterBroker extends DatacenterBroker {
 								} catch (Exception e) {
 									e.printStackTrace();
 								}
-								sendNow(getId(), CloudSimTags.CLOUDLET_RETURN, cl);
+								if(Simulate.PARTNER_CYCLING)
+								   sendPartnerRequest(cl);
+								else
+								   sendNow(getId(), CloudSimTags.CLOUDLET_RETURN, cl);
+
 							}
 						}
 					}
@@ -471,30 +475,30 @@ public class CustomDatacenterBroker extends DatacenterBroker {
 		sendNow(targetDatacenterId, CloudSimTags.DATACENTER_EXEC_TASK, vmId);
 	}
 	
-//	private void sendPartnerRequest(Cloudlet cloudlet) {
-//		CustomResCloudlet rcl = new CustomResCloudlet(cloudlet);
-//		List<PartnerInfomation> sentPartner = new ArrayList<PartnerInfomation>();
-//		
-//		for (PartnerInfomation pi: getPartnersList()) {
-//			if (pi.numOfTaskCanRequest() >= cloudlet.getCloudletLength()) {
-//				sendNow(pi.getPartnerId(), CloudSimTags.PARTNER_ESTIMATE_REQUEST, rcl);
-//				sentPartner.add(pi);
-//			}
-//		}
-//		
-//		if (sentPartner.isEmpty()) {
-//			try {
-//				cloudlet.setCloudletStatus(Cloudlet.FAILED);
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//			}
-//			sendNow(getId(), CloudSimTags.CLOUDLET_RETURN, cloudlet);
-//		} else {
-//			EstimationCloudletOfPartner estPartner = new EstimationCloudletOfPartner(new CustomResCloudlet(cloudlet), 
-//					sentPartner ,partnersList);
-//			getEstimateCloudletofParnerMap().put(cloudlet.getCloudletId(), estPartner);
-//		}
-//	}
+	private void sendPartnerRequest(Cloudlet cloudlet) {
+		CustomResCloudlet rcl = new CustomResCloudlet(cloudlet);
+		List<PartnerInfomation> sentPartner = new ArrayList<PartnerInfomation>();
+		
+		for (PartnerInfomation pi: getPartnersList()) {
+			if (pi.numOfTaskCanRequest() >= cloudlet.getCloudletLength()) {
+				sendNow(pi.getPartnerId(), CloudSimTags.PARTNER_ESTIMATE_REQUEST, rcl);
+				sentPartner.add(pi);
+			}
+		}
+		
+		if (sentPartner.isEmpty()) {
+			try {
+				cloudlet.setCloudletStatus(Cloudlet.FAILED);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			sendNow(getId(), CloudSimTags.CLOUDLET_RETURN, cloudlet);
+		} else {
+			EstimationCloudletOfPartner estPartner = new EstimationCloudletOfPartner(new CustomResCloudlet(cloudlet), 
+					sentPartner ,partnersList);
+			getEstimateCloudletofParnerMap().put(cloudlet.getCloudletId(), estPartner);
+		}
+	}
 	
 	@Override
 	protected void processResourceCharacteristicsRequest(SimEvent ev) {

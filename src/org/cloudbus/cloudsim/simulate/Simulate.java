@@ -47,7 +47,8 @@ public class Simulate {
 	public static final boolean UPDATE_SCALE_PARTNER = true;
 	public static final boolean PARTNER_BARTERING = true;
 	public static final double PARTNER_BARTERING_THRESHOLD = 2;
-
+	public static final boolean PARTNER_CYCLING = true;
+	
 	public static int cloudletLength = 100;
 	
 	private static List<DatacenterBroker> brokersList;
