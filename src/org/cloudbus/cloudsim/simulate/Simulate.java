@@ -34,7 +34,7 @@ import org.json.simple.parser.JSONParser;
  */
 public class Simulate {
 	
-	private static final String testcaseFilePath = "D:\\PD Nguyen\\workspace\\2016ISPDC\\testcases\\testcase_upscale\\testcase_ISPDC_upcale_2x_200.json";
+	private static final String testcaseFilePath = "D:\\PD Nguyen\\workspace\\2016CSCloud\\src\\cloudsim_simulator_v3.0.2\\testcases\\testcase_upscale\\testcase_ISPDC_upcale_2x_200.json";
 //	private static final String testcaseFilePath = "/home/ngtrieuvi92/zz/eclipse/cloudsim_simulator_v2.0/testcases/testcase_1.json";
 	
 	/**
@@ -45,7 +45,9 @@ public class Simulate {
 	public static final boolean USER_ALPHA_RATIO = true;
 	public static final boolean SCALABLE = true;
 	public static final boolean UPDATE_SCALE_PARTNER = true;
-	
+	public static final boolean PARTNER_BARTERING = true;
+	public static final double PARTNER_BARTERING_THRESHOLD = 2;
+
 	public static int cloudletLength = 100;
 	
 	private static List<DatacenterBroker> brokersList;

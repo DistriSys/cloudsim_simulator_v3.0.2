@@ -73,7 +73,9 @@ public class CustomDatacenterBroker extends DatacenterBroker {
 			case CloudSimTags.BROKER_ESTIMATE_NEXT_TASK:
 				estimateNextTask();
 				break;
-				
+			case CloudSimTags.PARTNER_BARTERING:
+				updateBartering(ev);
+				break;
 			case CloudSimTags.BROKER_ESTIMATE_RETURN:
 //				processInternalEstimateReturn(ev);
 				processIncomingCloudlet(ev);
@@ -268,36 +270,79 @@ public class CustomDatacenterBroker extends DatacenterBroker {
 				if (observe.getResCloudlet().getUserId() == getId()) {	// this is our cloudlet
 					CustomResCloudlet rcl = observe.getResCloudlet();
 					Cloudlet cl = rcl.getCloudlet();
+					boolean foundBartering = false;
 					printLog(3, getName() + ": WE OWN THIS CLOUDLET #" + observe.getResCloudlet().getCloudletId() );
-					
-					if (observe.isExecable()) {                         // Locally execute internal cloudlet
-						printLog(2, getName() + ": WE CAN EXEC THIS CLOUDLET #" + observe.getResCloudlet().getCloudletId() );
 
-						sendExecRequest(rcl.getBestDatacenterId(), rcl.getBestVmId(), rcl);
-					} else {                                            // Out of our capacity
-						printLog(2, CloudSim.clock() + ":" + getName() + ": WE NEED HELP FROM PARTNER on ClOUDLET #"
-								+ observe.getResCloudlet().getCloudlet().getCloudletId());
-						
-						int[] esl = estimateBestPartner(rcl);
-						if(esl[0] != -1 && esl[1]!=-1){
-							int partner_broker_id = esl[2];
+					if(Simulate.PARTNER_BARTERING){
+						// Apply force send-back task policy
+						printLog(3, getName() + ": WE APPLY BARTERING POLICY" );
+					p_seek:
+						for(PartnerInfomation pInfo :partnersList){
+							if(pInfo.getBartering() == true){
+								Vm bestVm = null;
+								List<Vm> vmList = pInfo.getBroker().getVmList();
+								
+								long maxProcessable = 0;
+								for (Vm vm: vmList) {
+									CloudletScheduler scheduler = vm.getCloudletScheduler();
+									double mips = vm.getMips();
+									double[] estimatedResult = scheduler.cloudletEstimate(cl, 0, mips);
+									
+									if (estimatedResult[1] > maxProcessable) {
+										maxProcessable = (long) estimatedResult[1];
+										bestVm = vm;
+									}
+								}
+								rcl.setMaxProcessable(maxProcessable);
+								if (bestVm != null) {
+									printLog(3, getName() + ": YALOO WE REACH here");
+									foundBartering = true;
+									pInfo.setBartering(false);
 
-							printLog(1, getName() + ": Sent Cloudlet: #" + cl.getCloudletId() + " Datacenter: " + esl[0] + " on Vm: " + esl[1]);						
+									rcl.setBestDatacenterId(pInfo.getBroker().getId());
+									rcl.setBestVmId(bestVm.getId());
+									rcl.getCloudlet().setVmId(rcl.getBestVmId());
 
-							rcl.setBestDatacenterId(esl[0]);
-							rcl.setBestVmId(esl[1]);
-							rcl.getCloudlet().setVmId(rcl.getBestVmId());
-							sendNow(rcl.getBestDatacenterId(), CloudSimTags.DATACENTER_EXEC_OUTSITETASK,rcl);
-							//Update partner receivingTask
-							sendNow(partner_broker_id, CloudSimTags.BROKER_UPDATE_RECEIVE_OUTSITETASK, rcl);
-						} else {
-							printLog(1, getName() + ": No datacenter to handle Cloudlet: #" + cl.getCloudletId());
-							try {
-								cl.setCloudletStatus(Cloudlet.FAILED);
-							} catch (Exception e) {
-								e.printStackTrace();
+									sendNow(rcl.getBestDatacenterId(), CloudSimTags.DATACENTER_EXEC_OUTSITETASK,rcl);
+									//Update partner receivingTask
+									sendNow(pInfo.getBroker().getId(), CloudSimTags.BROKER_UPDATE_RECEIVE_OUTSITETASK, rcl);
+
+									break p_seek;
+								} 								
 							}
-							sendNow(getId(), CloudSimTags.CLOUDLET_RETURN, cl);
+						}
+					}
+
+					if(foundBartering == false){
+						if (observe.isExecable()) {                         // Locally execute internal cloudlet
+							printLog(2, getName() + ": WE CAN EXEC THIS CLOUDLET #" + observe.getResCloudlet().getCloudletId() );
+	
+							sendExecRequest(rcl.getBestDatacenterId(), rcl.getBestVmId(), rcl);
+						} else {                                            // Out of our capacity
+							printLog(2, CloudSim.clock() + ":" + getName() + ": WE NEED HELP FROM PARTNER on ClOUDLET #"
+									+ observe.getResCloudlet().getCloudlet().getCloudletId());
+							
+							int[] esl = estimateBestPartner(rcl);
+							if(esl[0] != -1 && esl[1]!=-1){
+								int partner_broker_id = esl[2];
+	
+								printLog(1, getName() + ": Sent Cloudlet: #" + cl.getCloudletId() + " Datacenter: " + esl[0] + " on Vm: " + esl[1]);						
+	
+								rcl.setBestDatacenterId(esl[0]);
+								rcl.setBestVmId(esl[1]);
+								rcl.getCloudlet().setVmId(rcl.getBestVmId());
+								sendNow(rcl.getBestDatacenterId(), CloudSimTags.DATACENTER_EXEC_OUTSITETASK,rcl);
+								//Update partner receivingTask
+								sendNow(partner_broker_id, CloudSimTags.BROKER_UPDATE_RECEIVE_OUTSITETASK, rcl);
+							} else {
+								printLog(1, getName() + ": No datacenter to handle Cloudlet: #" + cl.getCloudletId());
+								try {
+									cl.setCloudletStatus(Cloudlet.FAILED);
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+								sendNow(getId(), CloudSimTags.CLOUDLET_RETURN, cl);
+							}
 						}
 					}
 
@@ -384,7 +429,15 @@ public class CustomDatacenterBroker extends DatacenterBroker {
 		//Forward update
 		if(estimated_partner[0] != -1 && estimated_partner[1] != -1){
 			selected_pi.setRequested(rcl.getCloudletLength());
-			updatePartnerInformation(selected_pi);
+			updatePartnerInformationByValue(selected_pi.getBroker().getId(),rcl.getCloudletLength(),0);
+			
+			if (Simulate.PARTNER_BARTERING){
+				if (selected_pi.getKRatioWithCurrentTask(rcl.getCloudletLength(), 0) >= Simulate.PARTNER_BARTERING_THRESHOLD){
+					printLog(3, getName() + ": YALOO WE TOUCH here");
+					//do a partner send_back_forcing
+					sendNow(selected_pi.getBroker().getId(), CloudSimTags.PARTNER_BARTERING, rcl);
+				}
+			}
 		}
 		return estimated_partner;
 	}
@@ -516,6 +569,13 @@ public class CustomDatacenterBroker extends DatacenterBroker {
 		}
 	}
 	
+	private void updateBartering(SimEvent ev) {
+		for(PartnerInfomation pInfo :partnersList){
+			if(pInfo.getBroker().getId() == ev.getSource())
+				pInfo.setBartering(true);
+		}
+	}
+
 	private void updatePartnerInformation(PartnerInfomation currentBestPartner) {
 		if(currentBestPartner.getPartnerId() == -1){
 			return;

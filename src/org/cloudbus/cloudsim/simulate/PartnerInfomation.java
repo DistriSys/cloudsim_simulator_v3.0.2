@@ -11,6 +11,7 @@ public class PartnerInfomation {
 	
 	private double receivedApps;
 	
+	private boolean bartering = false;
 	private double partnerVm;
 	private double ownVm;
 	
@@ -161,6 +162,14 @@ public class PartnerInfomation {
 
 	public void setSatified(double receivedApps) {
 		this.receivedApps = receivedApps;
+	}
+
+	public boolean getBartering(){
+		return bartering;
+	}
+
+	public void setBartering(boolean bartering){
+		this.bartering = bartering;
 	}
 
 	public double getLenghtRatio() {
