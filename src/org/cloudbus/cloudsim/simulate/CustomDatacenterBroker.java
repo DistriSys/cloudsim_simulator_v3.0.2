@@ -196,7 +196,6 @@ public class CustomDatacenterBroker extends DatacenterBroker {
 						if (Simulate.USER_ALPHA_RATIO) {
 							int partnerVm = pi.getPartnerVm();
 							double ourVm = getVmSize();
-							double newRatio = partnerVm / ourVm;
 
 							pi.setContractRatio(partnerVm, ourVm);
 							
@@ -559,7 +558,7 @@ public class CustomDatacenterBroker extends DatacenterBroker {
 					sendNow(partnerCloudletEstimateList.getCurrentBestPartnerId(), CloudSimTags.PARTNER_EXEC, resCloudlet);
 
 					Log.printLine(getName() + ": has Cloudlet #" + resCloudlet.getCloudletId() + " PARTNER_EXEC by #" + partnerCloudletEstimateList.getCurrentBestPartnerId());
-					Log.printLine(getName()+" Best K ratio:"+best.getkRatio() + " of cloudlet #" + resCloudlet.getCloudletId()+"is partner #"+partnerCloudletEstimateList.getCurrentBestPartnerId());
+					Log.printLine(getName()+" Best K ratio:"+best.getKRatio() + " of cloudlet #" + resCloudlet.getCloudletId()+"is partner #"+partnerCloudletEstimateList.getCurrentBestPartnerId());
 				} else {
 					Log.printLine(CloudSim.clock()+ " Our partner can not EXEC cloudlet #" + resCloudlet.getCloudletId());
 //					resCloudlet.setCloudletStatus(Cloudlet.FAILED);
