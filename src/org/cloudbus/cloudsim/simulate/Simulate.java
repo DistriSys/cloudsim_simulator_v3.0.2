@@ -371,9 +371,9 @@ public class Simulate {
 		
 		for (int i = 0; i < totalPartner; i++) {
 			PartnerInfomation pInfo = partnerInfo.get(i);
-//			Log.printLine(pInfo.getPartnerId()+":"+pInfo.getkRatio());
+			Log.printLine(pInfo.getPartnerId()+":"+pInfo.getKRatio());
 			totalKRatio += pInfo.getKRatio();
-//			Log.printLine(pInfo.getRequested() + " / " + pInfo.getSatified());
+			Log.printLine(pInfo.getRequested() + " / " + pInfo.getSatified());
 		}
 		
 		Log.printLine(name+ indent + totalCloudlet + indent  + indent + successCloudlet + indent + indent +  dft.format((double)successCloudlet / totalCloudlet * 100) + "%"
