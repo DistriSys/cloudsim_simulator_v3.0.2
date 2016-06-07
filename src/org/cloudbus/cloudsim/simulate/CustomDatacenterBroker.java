@@ -152,7 +152,6 @@ public class CustomDatacenterBroker extends DatacenterBroker {
 				if (cloudlet.getUserRequestTime() <= CloudSim.clock()) {
 					setEstimationStatus(RUNNING);
 					createCloudletObserve(cloudlet);
-					
 					for (Integer datacenterId: getDatacenterIdsList()) {
 						CustomResCloudlet rcl = new CustomResCloudlet(cloudlet);
 						printLog(2, CloudSim.clock()+" datacenterId DATACENTER_ESTIMATE_TASK " +datacenterId);
