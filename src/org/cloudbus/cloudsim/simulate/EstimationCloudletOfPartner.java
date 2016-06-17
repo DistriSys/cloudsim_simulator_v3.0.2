@@ -20,7 +20,7 @@ public class EstimationCloudletOfPartner {
 		this.setGlobalpartnerLists(globalpartnerLists);
 		this.currentBestPartnerId = -1;
 		this.currentBestPartner = new PartnerInfomation(-1);
-		this.currentBestPartner.setkRatio(-1);
+//		this.currentBestPartner.setKRatio(-1);
 	}
 	
 	/**
@@ -49,9 +49,9 @@ public class EstimationCloudletOfPartner {
 		if (maxProcessable == resCloudlet.getCloudletLength()){
 			double k = calcPartnerKRatio(partnerId,reResCloudlet);
 			Log.printLine("Cloulet :"+reResCloudlet.getCloudletId()+" K of partner#: "+partnerId + "; K: "+k);
-			if((getCurrentBestPartner().getPartnerId()  == -1) || getCurrentBestPartner().getkRatio() > k || getCurrentBestPartner().getkRatio()  == -1){
+			if((getCurrentBestPartner().getPartnerId()  == -1) || getCurrentBestPartner().getKRatio() > k || getCurrentBestPartner().getKRatio()  == -1){
 				currentBestPartner.setPartnerId(partnerId);
-				getCurrentBestPartner().setkRatio(k);
+//				getCurrentBestPartner().setKRatio(k);
 				currentBestPartner.setRequested(reResCloudlet.getCloudlet().getCloudletLength());
 //				Log.printLine(getCurrentBestPartner().getkRatio());
 				partner_cancel_waiting_exec[0] = currentBestPartnerId;

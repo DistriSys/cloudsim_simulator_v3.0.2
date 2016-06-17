@@ -34,7 +34,7 @@ import org.json.simple.parser.JSONParser;
  */
 public class Simulate {
 	
-	private static final String testcaseFilePath = "D:\\PD Nguyen\\workspace\\2016ISPDC\\testcases\\testcase_upscale\\testcase_ISPDC_upcale_2x_200.json";
+	private static final String testcaseFilePath = "D:\\PD Nguyen\\workspace\\2016CSCloud\\src\\cloudsim_simulator_v3.0.2\\testcases\\testcase_upscale\\testcase_ISPDC_upcale_2x_200.json";
 //	private static final String testcaseFilePath = "/home/ngtrieuvi92/zz/eclipse/cloudsim_simulator_v2.0/testcases/testcase_1.json";
 	
 	/**
@@ -45,6 +45,9 @@ public class Simulate {
 	public static final boolean USER_ALPHA_RATIO = true;
 	public static final boolean SCALABLE = true;
 	public static final boolean UPDATE_SCALE_PARTNER = true;
+	public static final boolean PARTNER_BARTERING = true;
+	public static final double PARTNER_BARTERING_THRESHOLD = 2;
+	public static final boolean PARTNER_CYCLING = true;
 	
 	public static int cloudletLength = 100;
 	
@@ -74,7 +77,7 @@ public class Simulate {
 
             JSONParser jsonParser = new JSONParser();
             JSONArray members = (JSONArray) jsonParser.parse(reader);
-            
+
             // Create Datacenterbrokers
             for (int i = 0; i < members.size(); i++) {
             	JSONObject member = (JSONObject) members.get(i);
@@ -100,7 +103,7 @@ public class Simulate {
             	for (int j = 0; j < m_cloudlets.size(); j++) {
             		JSONObject m_cloudlet = (JSONObject) m_cloudlets.get(j);
 	            	int cloudlet_quantity = ((Long) m_cloudlet.get("quantity")).intValue();
-	            	int cloudletId_prefix = broker.getId() * 10000 + j * 1000;
+	            	int cloudletId_prefix = broker.getId() * 1000000 + j * 1000;
 	            	
 	        		long length = (Long) m_cloudlet.get("long");
 	        		if (cloudletLength == 0) cloudletLength = (int) length;
@@ -368,9 +371,9 @@ public class Simulate {
 		
 		for (int i = 0; i < totalPartner; i++) {
 			PartnerInfomation pInfo = partnerInfo.get(i);
-//			Log.printLine(pInfo.getPartnerId()+":"+pInfo.getkRatio());
-			totalKRatio += pInfo.getkRatio();
-//			Log.printLine(pInfo.getRequested() + " / " + pInfo.getSatified());
+			Log.printLine(pInfo.getPartnerId()+":"+pInfo.getKRatio());
+			totalKRatio += pInfo.getKRatio();
+			Log.printLine(pInfo.getRequested() + " / " + pInfo.getSatified());
 		}
 		
 		Log.printLine(name+ indent + totalCloudlet + indent  + indent + successCloudlet + indent + indent +  dft.format((double)successCloudlet / totalCloudlet * 100) + "%"
@@ -411,7 +414,7 @@ public class Simulate {
 			for (int i = 0; i < partnerInfo.size(); i++) {
 				PartnerInfomation pInfo = partnerInfo.get(i);
 //				Log.printLine(pInfo.getPartnerId()+":"+pInfo.getkRatio());
-				total_partner_k_ratio += Math.abs(pInfo.getkRatio());
+				total_partner_k_ratio += Math.abs(pInfo.getKRatio());
 			}
 		}
 		
